@@ -1,10 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import prisma from "@/db/prisma";
-import {auth} from "@clerk/nextjs/server"
-import { redirect } from "next/navigation";
+export const dynamic = 'force-dynamic'
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { shortId: string } }
 ) {
   const link = await prisma.link.findUnique({
@@ -12,10 +11,6 @@ export async function GET(
   });
 
   if (!link) {
-    const { userId } = await auth()
-    if (!userId) {
-      redirect('/')
-    }
     return new NextResponse("Not Found", { status: 404 });
   }
 
@@ -28,7 +23,7 @@ export async function GET(
       data: { clicks: { increment: 1 } },
     });
 
-     cookieStore.set(`clicked_${link.id}`, "true", {
+    cookieStore.set(`clicked_${link.id}`, "true", {
       maxAge: 60, // 60 seconds
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
