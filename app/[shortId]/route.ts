@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: { shortId: string } }
 ) {
   const link = await prisma.link.findUnique({
-    where: { shortId: params.shortId },
+    where: { shortId: await params.shortId },
   });
 
   if (!link) {
